@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Receipt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+
+        .receipt {
+            width: 800px;
+            background: #fff;
+            margin: 20px auto;
+            padding: 20px 40px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: #f15b5b;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            background: #f15b5b;
+            color: #fff;
+            padding: 8px 10px;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .info .box {
+            width: 48%;
+            margin-bottom: 15px;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        .info strong {
+            display: inline-block;
+            width: 120px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table thead {
+            background: #1f77d0;
+            color: #fff;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .totals {
+            margin-top: 20px;
+            float: right;
+            width: 300px;
+        }
+
+        .totals p {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .footer {
+            clear: both;
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            background: #f15b5b;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .signature {
+            margin-top: 40px;
+        }
+
+        .signature p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="receipt">
+        <div class="header">Laptop Store Receipt</div>
+
+        <div class="section-title">Customer Information</div>
+        <div class="info">
+            <div class="box">
+                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Email:</strong> johndoe@email.com</p>
+                <p><strong>Phone Number:</strong> (123) 123-4567</p>
+                <p><strong>Address:</strong> 3383 Public Works Drive, Chattanooga, TN, 37421</p>
+            </div>
+            <div class="box">
+                <p><strong>Receipt Number:</strong> 002</p>
+                <p><strong>Delivery Date:</strong> April 10, 2019</p>
+                <p><strong>Delivery Address:</strong> 3383 Public Works Drive, Chattanooga, TN, 37421</p>
+            </div>
+        </div>
+
+        <div class="section-title">Order Details</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Item Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Product A</td>
+                    <td>10</td>
+                    <td>$50</td>
+                    <td>$500</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Product B</td>
+                    <td>10</td>
+                    <td>$30</td>
+                    <td>$300</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Product C</td>
+                    <td>20</td>
+                    <td>$20</td>
+                    <td>$400</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Product D</td>
+                    <td>15</td>
+                    <td>$30</td>
+                    <td>$450</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Product E</td>
+                    <td>15</td>
+                    <td>$50</td>
+                    <td>$750</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Product F</td>
+                    <td>10</td>
+                    <td>$15</td>
+                    <td>$150</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Product G</td>
+                    <td>15</td>
+                    <td>$10</td>
+                    <td>$150</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Product H</td>
+                    <td>10</td>
+                    <td>$30</td>
+                    <td>$300</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="signature">
+            <p><strong>Received By:</strong> Jane Smith</p>
+            <p><strong>Signature:</strong> __________________________</p>
+        </div>
+
+        <div class="totals">
+            <p><strong>Subtotal:</strong> <span>$2,650</span></p>
+            <p><strong>Delivery Charge:</strong> <span>$50</span></p>
+            <p><strong>Total Amount:</strong> <span>$2,700</span></p>
+        </div>
+
+        <div class="footer">
+            2142 Cuffman Alley, Bowling Green, KY, 42270 | (123)123-4567 | info@abcdbox.com | www.abcdbox.com
+        </div>
+    </div>
+</body>
+
+</html>
