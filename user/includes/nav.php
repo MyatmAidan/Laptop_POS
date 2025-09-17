@@ -65,7 +65,8 @@
                     </li>
                   <?php } ?>
                   <li>
-                    <a class="dropdown-item <?php echo (strpos($_SERVER['REQUEST_URI'], 'profile.php') !== false) ? 'active' : ''; ?>" href="profile.php">
+                    <a class="dropdown-item <?php echo (strpos($_SERVER['REQUEST_URI'], 'profile.php') !== false) ? 'active' : ''; ?>"
+                      href="profile.php?user_id=<?php echo urlencode($_SESSION['user_id']); ?>">
                       <i class="fas fa-user me-2"></i>Profile
                     </a>
                   </li>

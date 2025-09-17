@@ -12,7 +12,7 @@ $error_message =
 if (isset($_POST['form_sub']) && $_POST['form_sub'] == '1') {
     $name = $mysql->real_escape_string($_POST['name']);
     $brand_id = $mysql->real_escape_string($_POST['brand_id']);
-    $category_id = $mysql->real_escape_string($_POST['category']);
+    $category_id = $mysql->real_escape_string($_POST['category_id']);
     $description = $mysql->real_escape_string($_POST['description']);
     $qty = $mysql->real_escape_string($_POST['qty']);
     $price = $mysql->real_escape_string($_POST['price']);
@@ -148,14 +148,14 @@ require './layouts/header.php';
                             </div>
                             <div class="form-group">
                                 <label for="" class="form-label">Quantity</label>
-                                <input type="text" name="qty" class="form-control" id="qty" value="<?= $qty ?>" />
+                                <input type="text" name="qty" class="form-control" id="qty" value="" />
                                 <?php if ($error && $qty_error) { ?>
                                     <span class="text-danger"><?= $qty_error ?></span>
                                 <?php } ?>
                             </div>
                             <div class="form-group">
                                 <label for="" class="form-label">Price</label>
-                                <input type="text" name="price" class="form-control" id="price" value="<?= $price ?>" />
+                                <input type="text" name="price" class="form-control" id="price" value="" />
                                 <?php if ($error && $price_error) { ?>
                                     <span class="text-danger"><?= $price_error ?></span>
                                 <?php } ?>

@@ -23,17 +23,27 @@ if (isset($_POST['form_sub']) && $_POST['form_sub'] == '1') {
 
     if (!$error) {
 
-        $data = ['product_name' => $name];
-        $result = insertData('product', $mysql, $data);
+        // normalize to lowercase for checking
+        $check_sql = "SELECT product_id FROM product WHERE LOWER(product_name) = LOWER('$name') LIMIT 1";
+        $check_res = $mysql->query($check_sql);
 
-        if ($result) {
-            $product_id = $mysql->insert_id; // get last inserted product id
-            $url = $admin_base_url . "product_detail_create.php?id=$product_id&success=Created Success";
-            header("Location: $url");
-            exit;
-        } else {
+        if ($check_res && $check_res->num_rows > 0) {
             $error = true;
-            $error_message = "Product Create Fail.";
+            $error_message = "Product already exists.";
+        } else {
+
+            $data = ['product_name' => $name];
+            $result = insertData('product', $mysql, $data);
+
+            if ($result) {
+                $product_id = $mysql->insert_id; // get last inserted product id
+                $url = $admin_base_url . "product_detail_create.php?id=$product_id&success=Created Success";
+                header("Location: $url");
+                exit;
+            } else {
+                $error = true;
+                $error_message = "Product Create Fail.";
+            }
         }
     }
 }
@@ -86,3 +96,19 @@ require './layouts/header.php';
 
 <?php
 require './layouts/footer.php';
+
+?>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php if ($error && $error_message && !$name_error) { ?>
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Duplicate Product Name',
+            text: '<?= $error_message ?>',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        })
+    </script>
+<?php } ?>

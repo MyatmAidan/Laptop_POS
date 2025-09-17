@@ -102,7 +102,7 @@ require './layouts/footer.php';
     <script>
         Swal.fire({
             icon: 'warning',
-            title: 'Duplicate Brand',
+            title: 'Duplicate Category Name',
             text: '<?= $error_message ?>',
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'OK'

@@ -111,5 +111,15 @@ require './layouts/header.php';
 
     })
 </script>
+<?php if ($success): ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: ' Successfully',
+            text: '<?= $success ?>',
+            confirmButtonColor: '#3085d6'
+        });
+    </script>
+<?php endif; ?>
 <?php
 require './layouts/footer.php';

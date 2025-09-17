@@ -13,7 +13,7 @@ $query = "
     u.name AS user_name,
     p.product_name,
     b.brand_name,
-    (oi.quantity * oi.price) AS total_price,
+    o.total_amount AS total_price,
     o.shipping_address,
     o.shipping_city,
     o.shipping_state,
@@ -54,7 +54,7 @@ require './layouts/header.php';
     }
 
     .inv-header {
-        background: #f15b5b;
+        background: black;
         color: #fff;
         padding: 10px;
         text-align: center;
@@ -63,7 +63,7 @@ require './layouts/header.php';
     }
 
     .inv-section-title {
-        background: #f15b5b;
+        background: #483C32;
         color: #fff;
         padding: 6px 8px;
         margin: 15px 0 10px 0;
@@ -75,10 +75,11 @@ require './layouts/header.php';
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
+        width: 100%;
     }
 
     .info .box {
-        width: 48%;
+        /* width: 100%; */
         margin-bottom: 10px;
     }
 
@@ -99,8 +100,8 @@ require './layouts/header.php';
     }
 
     table thead {
-        background: #1f77d0;
-        color: #fff;
+        background: #F5DEB3;
+        color: black;
     }
 
     table th,
@@ -132,9 +133,38 @@ require './layouts/header.php';
         text-align: center;
         margin-top: 25px;
         padding: 10px;
-        background: #f15b5b;
+        background: black;
         color: #fff;
         font-size: 12px;
+    }
+
+    .status-selector {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .status-option {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 8px 10px;
+        cursor: pointer;
+        width: 100px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .status-option.active {
+        border-color: #007bff;
+        background: #007bff;
+        color: #fff;
+    }
+
+    .status-option i {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 4px;
     }
 </style>
 
@@ -171,9 +201,8 @@ require './layouts/header.php';
                                     <th class="col-1">No.</th>
                                     <th class="col-2">Customer Name</th>
                                     <th class="col-2">Product Name</th>
-                                    <th class="col-1">Brand</th>
                                     <th class="col-1">Total</th>
-                                    <th class="col-1">Status</th>
+                                    <th class="col-2">Status</th>
                                     <th class="col-2">Address</th>
                                     <th class="col-2">Action</th>
                                 </tr>
@@ -185,7 +214,6 @@ require './layouts/header.php';
                                             <td><?= $row['order_id'] ?></td>
                                             <td><?= $row['user_name'] ?></td>
                                             <td><?= $row['product_name'] ?></td>
-                                            <td><?= $row['brand_name'] ?></td>
                                             <td><?= $row['total_price'] ?></td>
                                             <td>
                                                 <?php if ($row['status'] === 'pending'): ?>
@@ -204,8 +232,15 @@ require './layouts/header.php';
                                             </td>
                                             <td><?= $row['shipping_zip'] . ', ' . $row['shipping_address'] . ', ' . $row['shipping_state'] . ', ' . $row['shipping_city'] . ', ' . $row['shipping_country'] ?></td>
                                             <td>
-                                                <a href="<?= $admin_base_url . 'product_detail_edit.php?id=' . $row['product_detail_id'] ?>" class="btn btn-sm btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
-                                                <button type="button" class="btn btn-sm btn-info receipt-btn"
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-info edit-btn"
+                                                    data-val="<?= $row['order_id'] ?>"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editOrderModal">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-warning receipt-btn"
                                                     data-val="<?= $row['order_id'] ?>"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#exampleModalCenter">
@@ -223,29 +258,74 @@ require './layouts/header.php';
         </div>
     </div>
 
+    <!-- Edit Order Status Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-3 text-center">
+                    <label for="order_status" class="form-label">Order Status</label>
+                    <div class="status-selector">
+                        <div class="status-option bg-warning <?= $status == 'pending' ? 'active' : '' ?>" data-value="pending">
+                            <i class="fas fa-clock"></i>
+                            <span>Pending</span>
+                        </div>
+                        <div class="status-option bg-info <?= $status == 'processing' ? 'active' : '' ?>" data-value="processing">
+                            <i class="fas fa-cogs"></i>
+                            <span>Processing</span>
+                        </div>
+                        <div class="status-option bg-primary <?= $status == 'shipped' ? 'active' : '' ?>" data-value="shipped">
+                            <i class="fas fa-truck"></i>
+                            <span>Shipped</span>
+                        </div>
+                        <div class="status-option bg-success <?= $status == 'delivered' ? 'active' : '' ?>" data-value="delivered">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Delivered</span>
+                        </div>
+                        <div class="status-option bg-danger <?= $status == 'cancelled' ? 'active' : '' ?>" data-value="cancelled">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Cancelled</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer p-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <input type="hidden" name="order_status" id="order_status" value="<?= $status ?>" required>
+                    <button type="button" class="btn btn-primary btn-sm" id="saveStatusBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- Invoice Modal -->
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">INVOICE</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-2">
-                    <div class="receipt">
+                    <div class="receipt" id="invoice">
                         <div class="inv-header">Laptop Store Receipt</div>
 
-                        <div class="section-title">Customer Information</div>
+                        <div class="inv-section-title">Customer Information</div>
                         <div class="info">
                             <div class="box">
-                                <p><strong>Name:</strong> John Doe</p>
-                                <p><strong>Email:</strong> johndoe@email.com</p>
-                                <p><strong>Phone:</strong> (123) 123-4567</p>
+                                <p>Receipt #: <strong id="inv_receipt">00</strong></p>
+                                <p>Name: <strong id="inv_name"></strong> </p>
+                                <p>Email:<strong id="inv_email"></strong></p>
                             </div>
                             <div class="box">
-                                <p><strong>Receipt #:</strong> 002</p>
-                                <p><strong>Date:</strong> April 10, 2019</p>
-                                <p><strong>Delivery:</strong> 3383 Public Works Drive, Chattanooga, TN</p>
+                                <p>Date: <strong id="inv_date"></strong></p>
+                                <p>Delivery:<strong id="inv_adderss"></strong></p>
                             </div>
                         </div>
 
@@ -260,45 +340,16 @@ require './layouts/header.php';
                                     <th>Amount</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Product A</td>
-                                    <td>10</td>
-                                    <td>$50</td>
-                                    <td>$500</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Product B</td>
-                                    <td>10</td>
-                                    <td>$30</td>
-                                    <td>$300</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Product C</td>
-                                    <td>20</td>
-                                    <td>$20</td>
-                                    <td>$400</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Product D</td>
-                                    <td>15</td>
-                                    <td>$30</td>
-                                    <td>$450</td>
-                                </tr>
+                            <tbody id="invoice-items">
+                                <!-- js will fill  -->
                             </tbody>
                         </table>
-                        <div class="totals">
-                            <p><strong>Subtotal:</strong> <span>$1,650</span></p>
-                            <p><strong>Delivery:</strong> <span>$50</span></p>
-                            <p><strong>Total:</strong> <span>$1,700</span></p>
+                        <div class="totals" id="invoice-summary">
+                            <!-- js will fill -->
                         </div>
-                        <br>
-                        <div class="inv-footer">
-                            2142 Cuffman Alley, Bowling Green, KY | (123)123-4567 | info@abcdbox.com
+
+                        <div class="inv-footer mt-5">
+                            No-137, Kyun Taw street, San Chaung | (+95) 9700070009 | info@laptopstore.com
                         </div>
                     </div>
                 </div>
@@ -315,12 +366,334 @@ require './layouts/header.php';
     function printInvoice() {
         var content = document.querySelector('.receipt').innerHTML;
         var printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<html><head><title>Invoice</title></head><body>');
-        printWindow.document.write(content);
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.print();
+
+        printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Invoice</title>
+                <style>
+                    @media print {
+                        @page {
+                            size: A5;
+                            margin: 10mm;
+                        }
+                        body {
+                            font-family: Arial, sans-serif;
+                            background: white;
+                            color: black;
+                            font-size: 12pt;
+                            max-width: 100%;
+                            margin: 0;
+                            padding: 0;
+                            display: flex;
+                            justify-content: center; 
+                            align-items: flex-start; 
+                        }
+                            .header {
+                                height: 120px;
+                                position: relative;
+                                color: black;
+                                padding: 10px 0px;
+                            }
+
+                            .header h1 {
+                                font-size: 18px;
+                            }
+                        .receipt {
+                            width: 100%;
+                            max-width: 500px;
+                                background: #fff;
+                                margin: 0 auto;
+                                padding: 15px 20px;
+                                box-shadow: none;
+                                font-size: 13px;
+                            }
+
+    .inv-header {
+        background: #000;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
     }
+
+    .inv-section-title {
+        background: #483C32;
+        color: white;
+        padding: 6px 8px;
+        margin: 15px 0 10px 0;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .info {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .info .box {
+        /* width: 100%; */
+        margin-bottom: 10px;
+    }
+
+    .info p {
+        margin: 3px 0;
+    }
+
+    .info strong {
+        display: inline-block;
+        width: 100px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+    }
+
+    table thead {
+        background: #F5DEB3;
+        color: #000;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        text-align: center;
+    }
+
+    table tbody tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    .totals {
+        margin-top: 15px;
+        float: right;
+        width: 240px;
+        font-size: 13px;
+    }
+
+    .totals p {
+        display: flex;
+        justify-content: space-between;
+        margin: 3px 0;
+    }
+
+    .inv-footer {
+        clear: both;
+        text-align: center;
+        margin-top: 25px;
+        padding: 10px;
+        background: #000;
+        color: #fff;
+        font-size: 12px;
+    }
+                    }           
+                </style>
+            </head>
+            <body>${invoice.outerHTML}</body>
+        </html>
+    `);
+
+        printWindow.document.close();
+        printWindow.focus();
+
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 300);
+
+    }
+
+    $(document).on('click', '.status-option', function() {
+        $('.status-option').removeClass('active');
+        $(this).addClass('active');
+        $('#order_status').val($(this).data('value'));
+    });
+
+
+
+    let currentOrderId = null;
+
+    $(document).on('click', '.edit-btn', function() {
+        currentOrderId = $(this).data('val'); // get order_id from button
+        console.log('Editing order ID:', currentOrderId);
+        $('#editOrderModal').modal('show');
+    });
+
+    $('#saveStatusBtn').on('click', function() {
+        const status = $('#order_status').val();
+
+        if (!currentOrderId || !status) {
+            alert('No order selected or status not chosen');
+            return;
+        }
+
+        $.ajax({
+            url: 'update_status.php',
+            type: 'POST',
+            data: {
+                order_id: currentOrderId,
+                status: status
+            },
+            success: function(res) {
+                console.log(res);
+                alert('Order status updated!');
+                $('#editOrderModal').modal('hide');
+                location.reload(); // optional: reload to see updated badge
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert('Failed to update status');
+            }
+        });
+    });
+
+
+
+
+    $(document).ready(function() {
+        $('.receipt-btn').click(function() {
+            const orderId = $(this).data('val');
+            const invoice_summary = $('#invoice-summary');
+            // Fetch invoice data using AJAX
+            $.ajax({
+                url: 'get_invoice.php',
+                type: 'GET',
+                // dataType: 'json',
+                data: {
+                    order_id: orderId
+                },
+                success: function(response) {
+                    console.log(response.order_info);
+
+                    let responseData = response.order;
+                    let responseItems = response.items;
+
+                    // format created_at to "Month Day, Year"
+                    const createdAt = new Date(responseData.created_at);
+                    const options = {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    };
+                    const formattedDate = createdAt.toLocaleDateString('en-US', options);
+
+                    // format order id like 005
+                    const receiptNo = String(responseData.order_id).padStart(3, '0');
+
+                    const address = responseData.shipping_address + ',' + responseData.shipping_city;
+
+                    $('#inv_receipt').text(receiptNo);
+                    $('#inv_name').text(responseData.user_name);
+                    $('#inv_email').text(responseData.email);
+                    $('#inv_date').text(formattedDate);
+                    $('#inv_adderss').text(address);
+                    $('#invoice-items').html('');
+                    $('#invoice-summary').html('');
+
+                    $('#invoice-items').html('');
+                    responseItems.forEach((item, index) => {
+                        $('#invoice-items').append(`
+                                <tr>
+                                    <td>${index+1}</td>
+                                    <td>${item.product_name}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.price}</td>
+                                    <td>${item.quantity * item.price}</td>
+                                </tr>
+                            `);
+                    });
+                    $('#invoice-items').append(`
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    `);
+
+                    $('#invoice-summary').append(`
+                        <p><span>Subtotal:</span> <span>$${responseData.total_amount}</span></p>
+                        <p><span>Tax (10%):</span> <span>$${(responseData.total_amount * 0.10).toFixed(2)}</span></p>
+                        <p><span>Total:</span> <span>$${(responseData.total_amount * 1.10).toFixed(2)}</span></p>
+                    `);
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error: ' + error);
+                }
+            });
+        });
+    });
 </script>
 
 <?php require './layouts/footer.php'; ?>

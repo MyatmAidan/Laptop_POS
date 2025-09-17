@@ -1,4 +1,5 @@
 <?php
+session_start();
 require '../database/dbrequire.php';
 require './layouts/common.php';
 require '../database/common_function.php';
@@ -14,6 +15,8 @@ if ($delete_id !== '') {
         header("Location: $url");
     }
 }
+$current_user_id = $_SESSION['user_id'] ?? 0;
+
 require './layouts/header.php';
 ?>
 
@@ -71,8 +74,15 @@ require './layouts/header.php';
                                             <td><?= $row['email'] ?></td>
                                             <td><?= $row['role'] ?></td>
                                             <td>
-                                                <a href="<?= $admin_base_url . 'user_edit.php?id=' . $row['id'] ?>" class="btn btn-sm btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
-                                                <button data-id="<?= $row['id'] ?>" class="btn btn-sm btn-danger delete_btn"><i class="fa-solid fa-trash"></i></button>
+                                                <a href="<?= $admin_base_url . 'app-profile.php?id=' . $row['id'] ?>" class="btn btn-sm btn-info">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+
+                                                <?php if ($row['id'] != $current_user_id): ?>
+                                                    <button data-id="<?= $row['id'] ?>" class="btn btn-sm btn-danger delete_btn">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                 <?php }

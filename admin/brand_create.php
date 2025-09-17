@@ -13,9 +13,9 @@ if (isset($_POST['form_sub']) && $_POST['form_sub'] == '1') {
     if ($name === '' || strlen($name) === 0) {
         $error = true;
         $name_error = "Please Fill Brand Name.";
-    } else if (strlen($name) < 3) {
+    } else if (strlen($name) < 2) {
         $error = true;
-        $name_error = "Brand name must be fill greater then 3.";
+        $name_error = "Brand name must be fill greater then 2.";
     } else if (strlen($name) > 100) {
         $error = true;
         $name_error = "Brand name must be fill less then 100.";
