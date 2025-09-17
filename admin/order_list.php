@@ -6,7 +6,18 @@ require '../database/common_function.php';
 $success = isset($_GET['success']) ? $_GET['success'] : '';
 $error = isset($_GET['error']) ? $_GET['error'] : '';
 
-// all-in-one query
+// Current page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 5; // 5 orders per page
+$offset = ($page - 1) * $limit;
+
+// Count total orders (for total pages)
+$countQuery = "SELECT COUNT(*) AS total FROM orders";
+$countRes = $mysql->query($countQuery);
+$totalOrders = $countRes->fetch_assoc()['total'];
+$totalPages = ceil($totalOrders / $limit);
+
+// Your query with LIMIT and OFFSET
 $query = "
    SELECT 
     o.order_id,
@@ -30,9 +41,12 @@ JOIN product_detail pd
 JOIN product p 
     ON pd.product_id = p.product_id
 JOIN brand b 
-    ON pd.brand_id = b.brand_id;
+    ON pd.brand_id = b.brand_id
+LIMIT $limit OFFSET $offset;
 ";
+
 $res = $mysql->query($query);
+
 
 require './layouts/header.php';
 ?>
@@ -69,6 +83,13 @@ require './layouts/header.php';
         margin: 15px 0 10px 0;
         font-weight: bold;
         font-size: 14px;
+    }
+
+    table td .badge {
+        font-size: 11px;
+        padding: 5px;
+        font-weight: 600;
+        color: #fff;
     }
 
     .info {
@@ -146,13 +167,19 @@ require './layouts/header.php';
     }
 
     .status-option {
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        padding: 8px 10px;
+        flex: 1;
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
         cursor: pointer;
-        width: 100px;
+        transition: all 0.3s ease;
         text-align: center;
-        transition: all 0.2s ease;
+        backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
     }
 
     .status-option.active {
@@ -165,6 +192,80 @@ require './layouts/header.php';
         display: block;
         font-size: 18px;
         margin-bottom: 4px;
+        color: #000;
+    }
+
+    .status-option span {
+        font-weight: 600;
+        color: #000;
+        font-size: 14px;
+    }
+
+    .status-option.active i {
+        color: #0d6efd;
+    }
+
+    .status-option.active span {
+        color: #0d6efd;
+    }
+
+    .status-option:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-option.active {
+        background: rgba(13, 110, 253, 0.2);
+        border-color: rgba(13, 110, 253, 0.5);
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.3);
+    }
+
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-table th,
+    .glass-table td {
+        background: rgba(255, 255, 255, 0.10) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    }
+
+    .pagination {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+        padding: 12px 20px;
+    }
+
+    .page-link {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #0e0e0e;
+        border: none;
+        padding: 6px 14px;
+        margin: 0 6px;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+        transition: 0.3s ease-in-out;
+    }
+
+    .page-item {
+        background-color: transparent;
+        color: #666;
+        border: none;
+        padding: 6px 8px;
+        margin: 0 2px;
+        font-weight: 600;
     }
 </style>
 
@@ -194,8 +295,8 @@ require './layouts/header.php';
 
             <div class="col-12">
                 <div class="card">
-                    <div class="card-body">
-                        <table class="table table-hover table-sm">
+                    <div class="glass-panel card-body">
+                        <table class="table table-hover table-sm table-bordered align-middle mb-0 glass-table">
                             <thead>
                                 <tr>
                                     <th class="col-1">No.</th>
@@ -252,6 +353,27 @@ require './layouts/header.php';
                                 } ?>
                             </tbody>
                         </table>
+                        <!-- Pagination -->
+                        <div class="pagination mt-3">
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <?php if ($page > 1): ?>
+                                        <li class="page-item"><a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a></li>
+                                    <?php endif; ?>
+
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <?php if ($page < $totalPages): ?>
+                                        <li class="page-item"><a class="page-link" href="?page=<?= $page + 1 ?>">Next</a></li>
+                                    <?php endif; ?>
+                                </ul>
+                            </nav>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -264,29 +386,31 @@ require './layouts/header.php';
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Update Order Status</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
                 <div class="modal-body p-3 text-center">
-                    <label for="order_status" class="form-label">Order Status</label>
+                    <label for="order_status" class="form-label my-4">
+                        <h4>Order Status</h4>
+                    </label>
                     <div class="status-selector">
-                        <div class="status-option bg-warning <?= $status == 'pending' ? 'active' : '' ?>" data-value="pending">
+                        <div class="status-option  <?= $status == 'pending' ? 'active' : '' ?>" data-value="pending">
                             <i class="fas fa-clock"></i>
                             <span>Pending</span>
                         </div>
-                        <div class="status-option bg-info <?= $status == 'processing' ? 'active' : '' ?>" data-value="processing">
+                        <div class="status-option  <?= $status == 'processing' ? 'active' : '' ?>" data-value="processing">
                             <i class="fas fa-cogs"></i>
                             <span>Processing</span>
                         </div>
-                        <div class="status-option bg-primary <?= $status == 'shipped' ? 'active' : '' ?>" data-value="shipped">
+                        <div class="status-option  <?= $status == 'shipped' ? 'active' : '' ?>" data-value="shipped">
                             <i class="fas fa-truck"></i>
                             <span>Shipped</span>
                         </div>
-                        <div class="status-option bg-success <?= $status == 'delivered' ? 'active' : '' ?>" data-value="delivered">
+                        <div class="status-option  <?= $status == 'delivered' ? 'active' : '' ?>" data-value="delivered">
                             <i class="fas fa-check-circle"></i>
                             <span>Delivered</span>
                         </div>
-                        <div class="status-option bg-danger <?= $status == 'cancelled' ? 'active' : '' ?>" data-value="cancelled">
+                        <div class="status-option  <?= $status == 'cancelled' ? 'active' : '' ?>" data-value="cancelled">
                             <i class="fas fa-times-circle"></i>
                             <span>Cancelled</span>
                         </div>
@@ -303,14 +427,14 @@ require './layouts/header.php';
     </div>
 
 
-
     <!-- Invoice Modal -->
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">INVOICE</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
                 <div class="modal-body p-2">
                     <div class="receipt" id="invoice">
@@ -516,8 +640,6 @@ require './layouts/header.php';
         $('#order_status').val($(this).data('value'));
     });
 
-
-
     let currentOrderId = null;
 
     $(document).on('click', '.edit-btn', function() {
@@ -553,8 +675,6 @@ require './layouts/header.php';
             }
         });
     });
-
-
 
 
     $(document).ready(function() {

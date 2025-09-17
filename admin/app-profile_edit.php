@@ -64,6 +64,70 @@ if (isset($_POST['form_sub']) && $_POST['form_sub'] == '1') {
 require './layouts/header.php';
 ?>
 
+<style>
+    .role-selector {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .role-option {
+        flex: 1;
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .role-option:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .role-option.active {
+        background: rgba(13, 110, 253, 0.2);
+        border-color: rgba(13, 110, 253, 0.5);
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .role-option i {
+        font-size: 24px;
+        color: #333;
+    }
+
+    .role-option.active i {
+        color: #0d6efd;
+    }
+
+    .role-option span {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .role-option.active span {
+        color: #0d6efd;
+    }
+
+    .profile-image-preview {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+</style>
+
 <!--**********************************
             Content body start
         ***********************************-->
@@ -101,15 +165,20 @@ require './layouts/header.php';
                                     <span class="text-danger"><?= $name_error ?></span>
                                 <?php } ?>
                             </div>
-                            <div class="form-group">
-                                <label for="" class="form-label">Role</label>
-                                <select class="form-control" name="role">
-                                    <option value="customer" <?= ($role == 'customer') ? 'selected' : '' ?>>Customer</option>
-                                    <option value="admin" <?= ($role == 'admin') ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                                <?php if ($error && $name_error) { ?>
-                                    <span class="text-danger"><?= $name_error ?></span>
-                                <?php } ?>
+
+                            <div class="form-group mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <div class="role-selector">
+                                    <div class="role-option <?= $role == 'customer' ? 'active' : '' ?>" value="customer">
+                                        <i class="fas fa-user"></i>
+                                        <span>Customer</span>
+                                    </div>
+                                    <div class="role-option <?= $role == 'admin' ? 'active' : '' ?>" value="admin">
+                                        <i class="fas fa-user-shield"></i>
+                                        <span>Admin</span>
+                                    </div>
+                                    <input type="hidden" name="role" id="role_input" value="<?= $role ?>" />
+                                </div>
                             </div>
 
                             <input type="hidden" name="form_sub" value="1" />
@@ -129,3 +198,23 @@ require './layouts/header.php';
 <?php
 require './layouts/footer.php';
 ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleOptions = document.querySelectorAll('.role-option');
+        const roleInput = document.getElementById('role');
+
+        roleOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                roleOptions.forEach(opt => opt.classList.remove('active'));
+
+                // Add active class to clicked option
+                this.classList.add('active');
+
+                // Update hidden input value
+                roleInput.value = this.getAttribute('data-value');
+            });
+        });
+    });
+</script>

@@ -17,6 +17,23 @@ if ($delete_id !== '') {
 require './layouts/header.php';
 ?>
 
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-table th,
+    .glass-table td {
+        background: rgba(255, 255, 255, 0.10) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    }
+</style>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -51,7 +68,7 @@ require './layouts/header.php';
             <div class="col-12">
 
                 <div class="card">
-                    <div class="card-body">
+                    <div class="glass-panel card-body">
                         <table class="table table-hover table-sm">
                             <thead>
                                 <tr>
