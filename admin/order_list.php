@@ -665,15 +665,27 @@ require './layouts/header.php';
             },
             success: function(res) {
                 console.log(res);
-                alert('Order status updated!');
-                $('#editOrderModal').modal('hide');
-                location.reload(); // optional: reload to see updated badge
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: 'Order status updated successfully.',
+                    showConfirmButton: true
+                }).then(() => {
+                    $('#editOrderModal').modal('hide');
+                    location.reload(); // reload after alert
+                });
             },
             error: function(xhr, status, error) {
                 console.error(error);
-                alert('Failed to update status');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to update status!',
+                });
             }
         });
+
     });
 
 
@@ -803,9 +815,11 @@ require './layouts/header.php';
                     `);
 
                     $('#invoice-summary').append(`
-                        <p><span>Subtotal:</span> <span>$${responseData.total_amount}</span></p>
-                        <p><span>Tax (10%):</span> <span>$${(responseData.total_amount * 0.10).toFixed(2)}</span></p>
-                        <p><span>Total:</span> <span>$${(responseData.total_amount * 1.10).toFixed(2)}</span></p>
+                        <p><span>Discount :</span> <span>$0.00</span></p>
+                        <p><span>Subtotal :</span> <span>$${responseData.total_amount}</span></p>
+                        <p><span>Tax (5%):</span> <span>$${(responseData.total_amount * 0.05).toFixed(2)}</span></p>
+                        <p><span>Grand Total :</span> <span>$${(responseData.total_amount * 1.10).toFixed(2)}</span></p>
+                        <p><span>Paid By :</span> <span> Credit Card</span></p>
                     `);
                 },
                 error: function(xhr, status, error) {
@@ -815,5 +829,7 @@ require './layouts/header.php';
         });
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php require './layouts/footer.php'; ?>

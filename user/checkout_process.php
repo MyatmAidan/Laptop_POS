@@ -29,7 +29,7 @@ $subtotal = 0.0;
 foreach ($cart as $it) {
     $subtotal += ((float)$it['price']) * ((int)$it['qty']);
 }
-$grandTotal = $subtotal;
+$grandTotal = $subtotal * 1.05; // Assuming 5% tax
 
 // Get shipping info from form
 $address  = trim($_POST['shipping_address'] ?? '');

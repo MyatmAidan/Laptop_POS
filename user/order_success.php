@@ -10,7 +10,7 @@ $orderId = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
     </div>
     <p>
         <a class="btn btn-primary" href="store.php">Continue Shopping</a>
-        <a class="btn btn-default" href="order.php">View My Orders</a>
+        <!-- <a class="btn btn-default" href="order.php">View My Orders</a> -->
     </p>
 </div>
 
